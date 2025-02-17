@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en"  data-bs-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="icon" href="static/icon/favicon.ico" type="image/x-icon">
+  <link href="static/css/bootstrap.min.css" rel="stylesheet">
+  <title>Telescope control</title>
+  <style>
+    .form-range::-webkit-slider-thumb {
+      background: yellowgreen;
+    }
+    .form-range::-moz-range-thumb {
+      background: yellowgreen;
+    }
+    .form-range::-ms-thumb {
+      background: yellowgreen;
+    }
+    .nav-tabs > li > button {
+      color: yellowgreen;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container text-warning">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-sm-4">
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Telescope</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Focuser</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Connection</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="disabled-tab" data-bs-toggle="tab" data-bs-target="#disabled-tab-pane" type="button" role="tab" aria-controls="disabled-tab-pane" aria-selected="false">Settings</button>
+          </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+            <div class="container">
+              <div class="row justify-content-left">
+                <div class="col-md-auto telescopInfo">Stellarium is not connected!</div>
+              </div>
+              <div class="row justify-content-left">
+                <div class="col-md-auto telescopCoordinates"></div>
+              </div>
+              <div class="row justify-content-center">
+                <div class="col">
+                  <div class="col-md-auto telescopHa"></div>
+                  <div class="col-md-auto telescopDec"></div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="switchMovement">
+                    <label class="form-check-label" for="flexSwitchCheckChecked">Movement</label>
+                  </div>
+
+                  <div id="coordinatesLabel">0/0</div>
+
+                  <label for="haCorrection" class="form-label" id="haCorrectionLabel">Ha</label>
+                  <div class="haCorrectionValue">0</div>
+                  <input type="range" class="form-range" min="-500" max="500" id="haCorrection">
+                  
+                  <label for="decCorrection" class="form-label" id="decCorrectionLabel">Dec</label>
+                  <div class="decCorrectionValue">0</div>
+                  <input type="range" class="form-range" min="-500" max="500" id="decCorrection">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+            <div class="focuserValue">0</div>
+
+            <label for="focuser" class="form-label">Focus</label>
+            <input type="range" class="form-range" min="0" max="1000" id="focuser">
+
+            <label for="focuserMicro" class="form-label">Micro focus</label>
+            <input type="range" class="form-range" min="-50" max="50" id="focuserMicro">
+          </div>
+          <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+            <div class="container">
+              <div class="input-group mb-3">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="intervalConnection">
+                  <label class="form-check-label" for="flexSwitchCheckChecked">Connect Stellarium</label>
+                </div>
+                <div class="row justify-content-left">
+                  <div class="col-md-auto stellariumInfo">Stellarium is not connected!</div>
+                </div>
+              </div>
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">Telescope com port</span>
+                <select class="form-select" id="selectTelescopePort" aria-label="Default select example">
+                  <option value="1" selected></option>
+                </select>
+                <button type="button" class="btn btn-primary" id="buttonTelescopeConnect">Connect</button>
+              </div>
+              
+            </div>
+          </div>
+          <div class="tab-pane fade" id="disabled-tab-pane" role="tabpanel" aria-labelledby="disabled-tab" tabindex="0">
+            <div class="input-group mb-3">
+              <label class="input-group-text">Stellarium url</label>
+              <input type="text" class="form-control" placeholder="stellariumUrl" aria-label="stellariumUrl"
+                value="http://localhost:8090">
+            </div>
+
+            <div class="input-group mb-3">
+              <label class="input-group-text" for="inputGroupSelect01">Type of telescope mount</label>
+              <select class="form-select" id="inputGroupSelect01">
+                <option value="EQ" selected>EQ</option>
+                <option value="AZ">AZ</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="basic-url" class="form-label">Steps in full rotation</label>
+              <div class="input-group">
+                <span class="input-group-text" id="basic-addon3">Ra</span>
+                <input type="text" class="form-control" placeholder="Ra" aria-label="Port" value="15360000">
+                <span class="input-group-text">Dec</span>
+                <input type="text" class="form-control" placeholder="Dec" aria-label="Port" value="15360000">
+              </div>
+              <div class="form-text" id="basic-addon4">Пример текста</div>
+            </div>
+
+            <button type="button" class="btn btn-success">Save</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="static/js/bootstrap.min.js"> </script>
+  <script src="static/stellarium.js"></script>
+</body>
+
+</html>
