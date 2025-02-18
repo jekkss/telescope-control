@@ -5,7 +5,7 @@ def stellariumConnect():
     url = 'http://localhost:8090/api/main/status'
 
     try:
-        StellariumResponse = requests.get(url)
+        StellariumResponse = requests.get(url, timeout = 2)
     except requests.ConnectionError:
         array = {
             'coordinates': '',
