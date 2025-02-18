@@ -50,7 +50,7 @@ const url = '/api'
     document.getElementById("intervalConnection").addEventListener("mousemove", function () {
       interval = document.querySelector('#intervalConnection')
       if (interval.checked) {
-        intervalConnection = window.setInterval(function () { stellariumConnect() }, 100)
+        intervalConnection = window.setInterval(function () { stellariumConnect() }, 150)
       }else{
         window.clearInterval(intervalConnection)
         
