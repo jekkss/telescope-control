@@ -18,9 +18,29 @@
     .form-range::-ms-thumb {
       background: yellowgreen;
     }
+    .nav-tabs > li > button:hover {
+      color: rgb(173, 231, 57);
+    }
     .nav-tabs > li > button {
       color: yellowgreen;
     }
+    .btn-primary{
+      background-color: yellowgreen;
+      border-color: white;
+    }
+    .btn-primary:hover, .btn-primary:visited {
+      background-color: rgb(162, 216, 54);
+      border-color: rgb(195, 255, 67);
+    }
+    .btn-primary:hover {
+      background-color: rgb(109, 145, 38) !important;
+      border-color: rgb(195, 255, 67) !important;
+    }
+
+    .form-check-input:checked{
+      background-color: yellowgreen;
+    }
+
   </style>
 </head>
 
@@ -100,6 +120,14 @@
                   <option value="1" selected></option>
                 </select>
                 <button type="button" class="btn btn-primary" id="buttonTelescopeConnect">Connect</button>
+              </div>
+
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">Focuser com port</span>
+                <select class="form-select" id="selectFocuserPort" aria-label="Default select example">
+                  <option value="1" selected></option>
+                </select>
+                <button type="button" class="btn btn-primary" id="buttonFocuserConnect">Connect</button>
               </div>
               
             </div>

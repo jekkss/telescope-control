@@ -166,6 +166,6 @@ const url = '/api'
     }
 
     
-    readSettings()
-    writeSettings()
+    //readSettings()
+    //writeSettings()
     intervalConnection = window.setInterval(function () { stellariumConnect() }, 100)
