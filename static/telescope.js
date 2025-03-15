@@ -18,6 +18,11 @@ document.getElementById("haCorrection").addEventListener("mousemove", function (
     }
   })
 
+  document.getElementById("buttonGoTo").addEventListener("mousedown", function () {
+    calculateSteps()
+    console.log(1)
+  })
+
   function calculateSteps(){
     let haResult = parseFloat((ha / 0.005625).toFixed(0)) + parseFloat(haCorrection)
     let decResult = parseFloat((dec / 0.084375).toFixed(0)) + parseFloat(decCorrection)
@@ -26,6 +31,7 @@ document.getElementById("haCorrection").addEventListener("mousemove", function (
     let dataJson = {
       ha: haResult,
       dec: decResult
-    }   
-    serialWrite(dataJson)
+    } 
+    console.log(Date.getTime())  
+    //serialWrite(dataJson)
   }

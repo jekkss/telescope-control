@@ -14,23 +14,34 @@ def serialPorts():
 def serialOpen(data):
     global telescopeComPort
     port = data.decode('utf-8').replace('"', '')
-    try:
-        telescopeComPort = serial.Serial(port, 9600) 
-        return port + " connected"
-    except:
-        return port + " disconnected"
+    
+    if(telescopeComPort != None):
+        telescopeComPort.close()
+        
+        telescopeComPort = serial.Serial(port, 9600)
+        
+        if telescopeComPort.is_open:
+           return port + " open" 
+    else:
+        try:
+            telescopeComPort = serial.Serial(port, 9600) 
+            return port + " connected"
+        except:
+            return port + " disconnected"
     
     
 
 def serialWrite(data):
     global telescopeComPort
-    dataJson = data
-    print(dataJson)
-    telescopeComPort.write(data)
+    #dataJson = data
+    
+    if telescopeComPort.is_open:
+        telescopeComPort.write(data)
+        print(data)
     
 
 def serialRead(port):
-    ser = serial.Serial(port, 9600) # change 'COM3' to your Arduino port
+    ser = serial.Serial(port, 9600)
     data = ser.readline().decode()
     ser.close()
     return data
