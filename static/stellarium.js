@@ -5,19 +5,27 @@ let loadingSpinner = document.querySelector('#loadingSpinner')
 let ha = 0, dec = 0, haCorrection = 0, decCorrection = 0
 
 document.getElementById("haCorrection").addEventListener("mouseup", function () {
-  if (haCorrection != this.value) {
-    haCorrection = this.value
-    document.querySelector('.haCorrectionValue').innerHTML = haCorrection
-    calculateSteps()
-  }
+  haCorrection = Number(document.getElementById('haCorrectionMicro').value) + Number(this.value)
+  document.querySelector('.haCorrectionValue').innerHTML = haCorrection
+  calculateSteps()
+})
+
+document.getElementById("haCorrectionMicro").addEventListener("mouseup", function () {
+  haCorrection = Number(document.getElementById('haCorrection').value) + Number(this.value)
+  document.querySelector('.haCorrectionValue').innerHTML = haCorrection
+  calculateSteps()
 })
 
 document.getElementById("decCorrection").addEventListener("mouseup", function () {
-  if (decCorrection != this.value) {
-    decCorrection = this.value
-    document.querySelector('.decCorrectionValue').innerHTML = decCorrection
-    calculateSteps()
-  }
+  decCorrection = Number(document.getElementById('decCorrectionMicro').value) + Number(this.value)
+  document.querySelector('.decCorrectionValue').innerHTML = decCorrection
+  calculateSteps()
+})
+
+document.getElementById("decCorrectionMicro").addEventListener("mouseup", function () {
+  decCorrection = Number(document.getElementById('decCorrection').value) + Number(this.value)
+  document.querySelector('.decCorrectionValue').innerHTML = decCorrection
+  calculateSteps()
 })
 
 document.getElementById("buttonGoTo").addEventListener("mousedown", function () {
@@ -80,8 +88,8 @@ async function readSettings() {
 
 function calculateSteps(){
   
-  let haResult = parseFloat((ha / 0.005625).toFixed(0)) + parseFloat(haCorrection)
-  let decResult = parseFloat((dec / 0.084375).toFixed(0)) + parseFloat(decCorrection)
+  let haResult = parseFloat((ha / 0.005625).toFixed(0)) + parseFloat(haCorrection) + parseFloat(haCorrectionMicro)
+  let decResult = parseFloat((dec / 0.084375).toFixed(0)) + parseFloat(decCorrection) + parseFloat(decCorrectionMicro)
    
   if(haResult > 7680000){
     haResult -= 7680000
