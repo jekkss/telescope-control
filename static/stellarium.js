@@ -27,6 +27,18 @@ document.getElementById("buttonGoTo").addEventListener("mousedown", function () 
   }, (100));
 })
 
+document.getElementById("buttonMovement").addEventListener("mousedown", function () {
+  switchMovement.checked = !switchMovement.checked
+})
+
+document.getElementById("buttonHome").addEventListener("mousedown", function () {
+  let dataJson = {
+    ha: 0,
+    dec: 0
+  }   
+  serialWrite(dataJson)
+})
+
 document.getElementById("selectTelescopePort").addEventListener("mousedown", function () {
   document.getElementById('selectTelescopePort').options.length = 0;
   serialPorts()

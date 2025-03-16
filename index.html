@@ -78,9 +78,9 @@
                   <div class="col-md-auto telescopDec"></div>
 
                   <button class="btn btn-primary" type="button" id="buttonGoTo">Go To</button>
-                  <button class="btn btn-primary" type="button">Movement</button>
+                  <button class="btn btn-primary" type="button" id="buttonMovement">Movement</button>
                   <button class="btn btn-primary" type="button">Stop</button>
-                  <button class="btn btn-primary" type="button">Home</button>
+                  <button class="btn btn-primary" type="button" id="buttonHome">Home</button>
 
                   <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" id="switchMovement">
@@ -92,10 +92,12 @@
                   <label for="haCorrection" class="form-label" id="haCorrectionLabel">Ha</label>
                   <div class="haCorrectionValue">0</div>
                   <input type="range" class="form-range" min="-1000000" max="1000000" id="haCorrection">
+                  <input type="range" class="form-range" min="-10000" max="10000" id="haCorrectionMicro">
                   
                   <label for="decCorrection" class="form-label" id="decCorrectionLabel">Dec</label>
                   <div class="decCorrectionValue">0</div>
                   <input type="range" class="form-range" min="-1000000" max="1000000" id="decCorrection">
+                  <input type="range" class="form-range" min="-10000" max="10000" id="decCorrectionMicro">
 
                 </div>
               </div>
