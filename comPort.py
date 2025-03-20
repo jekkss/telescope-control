@@ -18,13 +18,13 @@ def serialOpen(data):
     if(telescopeComPort != None):
         telescopeComPort.close()
         
-        telescopeComPort = serial.Serial(port, 9600)
+        telescopeComPort = serial.Serial(port, 115200)
         
         if telescopeComPort.is_open:
            return port + " open" 
     else:
         try:
-            telescopeComPort = serial.Serial(port, 9600) 
+            telescopeComPort = serial.Serial(port, 115200) 
             return port + " connected"
         except:
             return port + " disconnected"
@@ -41,7 +41,7 @@ def serialWrite(data):
     
 
 def serialRead(port):
-    ser = serial.Serial(port, 9600)
+    ser = serial.Serial(port, 115200)
     data = ser.readline().decode()
     ser.close()
     return data

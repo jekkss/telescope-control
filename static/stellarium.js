@@ -2,37 +2,42 @@ const url = '/api'
 let haSteps = 0, decSteps = 0
 let focuser = 0
 let loadingSpinner = document.querySelector('#loadingSpinner')
-let ha = 0, dec = 0, haCorrection = 0, decCorrection = 0
+let ha = 0, dec = 0, haCorrection = 0, decCorrection = 0, haCorrectionOld = 0, decCorrectionOld = 0
+let haStepInSec = 0, decStepInSec = 0, haStepOld = 0, decStepOld = 0, stepInSecTime = 0
+let haResult = 0, decResult = 0
 
 document.getElementById("haCorrection").addEventListener("mouseup", function () {
   haCorrection = Number(document.getElementById('haCorrectionMicro').value) + Number(this.value)
   document.querySelector('.haCorrectionValue').innerHTML = haCorrection
-  calculateSteps()
+  calculateSteps("goto")
 })
 
-document.getElementById("haCorrectionMicro").addEventListener("mouseup", function () {
+document.getElementById("haCorrectionMicro").addEventListener("mousemove", function () {
   haCorrection = Number(document.getElementById('haCorrection').value) + Number(this.value)
-  document.querySelector('.haCorrectionValue').innerHTML = haCorrection
-  calculateSteps()
+  if(haCorrection != haCorrectionOld){
+    haCorrectionOld = haCorrection
+    document.querySelector('.haCorrectionValue').innerHTML = haCorrection
+    calculateSteps("goto")
+  }
 })
 
 document.getElementById("decCorrection").addEventListener("mouseup", function () {
   decCorrection = Number(document.getElementById('decCorrectionMicro').value) + Number(this.value)
   document.querySelector('.decCorrectionValue').innerHTML = decCorrection
-  calculateSteps()
+  calculateSteps("goto")
 })
 
-document.getElementById("decCorrectionMicro").addEventListener("mouseup", function () {
+document.getElementById("decCorrectionMicro").addEventListener("mousemove", function () {
   decCorrection = Number(document.getElementById('decCorrection').value) + Number(this.value)
-  document.querySelector('.decCorrectionValue').innerHTML = decCorrection
-  calculateSteps()
+  if(decCorrection != decCorrectionOld){
+    document.querySelector('.decCorrectionValue').innerHTML = decCorrection
+    decCorrectionOld = decCorrection
+    calculateSteps("goto")
+  }
 })
 
 document.getElementById("buttonGoTo").addEventListener("mousedown", function () {
-  switchMovement.checked = true
-  setTimeout(function() {
-    switchMovement.checked = false
-  }, (100));
+  calculateSteps("goto")
 })
 
 document.getElementById("buttonMovement").addEventListener("mousedown", function () {
@@ -42,7 +47,8 @@ document.getElementById("buttonMovement").addEventListener("mousedown", function
 document.getElementById("buttonHome").addEventListener("mousedown", function () {
   let dataJson = {
     ha: 0,
-    dec: 0
+    dec: 0,
+    command: "goto"
   }   
   serialWrite(dataJson)
 })
@@ -86,25 +92,24 @@ async function readSettings() {
   return Promise.json
 }
 
-function calculateSteps(){
+function calculateSteps(command){
   
-  let haResult = parseFloat((ha / 0.005625).toFixed(0)) + parseFloat(haCorrection) + parseFloat(haCorrectionMicro)
-  let decResult = parseFloat((dec / 0.084375).toFixed(0)) + parseFloat(decCorrection) + parseFloat(decCorrectionMicro)
+  haResult = parseFloat((ha / 0.005625).toFixed(0)) + parseFloat(haCorrection)
+  decResult = parseFloat((dec / 0.084375).toFixed(0)) + parseFloat(decCorrection)
    
   if(haResult > 7680000){
     haResult -= 7680000
-    decResult = 7680000 - decResult//decResult - 3840000
-  }/*else{
-    decResult = (3840000 - decResult)
-  }*/
-  //haResult = 0
-  //decResult = 0 
+    decResult = 7680000 - decResult
+  }
   serialData = haResult + "/" + decResult
 
   document.querySelector('#coordinatesLabel').innerHTML = serialData
   let dataJson = {
     ha: haResult,
-    dec: decResult
+    dec: decResult,
+    command: command,
+    haSpeed: haStepInSec.toFixed(4),
+    decSpeed: decStepInSec.toFixed(4)
   }   
   serialWrite(dataJson)
 }
@@ -120,17 +125,25 @@ async function stellariumConnect() {
         if (document.querySelector('.telescopInfo').innerHTML.substring(0, 10) != json.info.substring(0, 10)) {
           switchMovement.checked = false  
         } document.querySelector('.telescopInfo').innerHTML = json.info
+        document.querySelector('.telescopCoordinates').innerHTML = "HA/Dec: " + json.coordinates
+        ha = parseFloat(json.coordinates.substring(0, 2)) * 3600 + parseFloat(json.coordinates.substring(3, 5)) * 60 + parseFloat(json.coordinates.substring(6, 11))
+        dec = (parseFloat(json.coordinates.substring(14, 16)) * 3600 + parseFloat(json.coordinates.substring(17, 19)) * 60 + parseFloat(json.coordinates.substring(20, 24)))
+        if (json.coordinates.substring(13, 14) == "-") {
+          dec = -dec
+        }
+        
+        document.querySelector('.telescopHa').innerHTML = "HA: " + ha.toFixed(1) + "/" + (ha / 0.005625).toFixed(0)
+        document.querySelector('.telescopDec').innerHTML = "Dec: " + dec.toFixed(1) + "/" + (dec / 0.084375).toFixed(0)
         if (switchMovement.checked) {
-          document.querySelector('.telescopCoordinates').innerHTML = "HA/Dec: " + json.coordinates
-          ha = parseFloat(json.coordinates.substring(0, 2)) * 3600 + parseFloat(json.coordinates.substring(3, 5)) * 60 + parseFloat(json.coordinates.substring(6, 11))
-          dec = (parseFloat(json.coordinates.substring(14, 16)) * 3600 + parseFloat(json.coordinates.substring(17, 19)) * 60 + parseFloat(json.coordinates.substring(20, 24)))
-          if (json.coordinates.substring(13, 14) == "-") {
-            dec = -dec
-          }
-
-          document.querySelector('.telescopHa').innerHTML = "HA: " + ha.toFixed(1) + "/" + (ha / 0.005625).toFixed(0)
-          document.querySelector('.telescopDec').innerHTML = "Dec: " + dec.toFixed(1) + "/" + (dec / 0.084375).toFixed(0)
-          calculateSteps()
+          haResult = parseFloat((ha / 0.005625).toFixed(0)) + parseFloat(haCorrection)
+          decResult = parseFloat((dec / 0.084375).toFixed(0)) + parseFloat(decCorrection)
+        
+          haStepInSec = (haResult - haStepOld) / (Date.now() - stepInSecTime)
+          haStepOld = haResult
+          decStepInSec = (decResult - decStepOld) / (Date.now() - stepInSecTime)
+          decStepOld = decResult
+          stepInSecTime = Date.now()
+          calculateSteps("movement")
         }
       } else {
         document.querySelector('.stellariumInfo').innerHTML = "Stellarium connected! The object is not selected!"
@@ -147,4 +160,4 @@ async function stellariumConnect() {
     
 //readSettings()
 //writeSettings()
-intervalConnection = window.setInterval(function () { stellariumConnect() }, 100)
+intervalConnection = window.setInterval(function () { stellariumConnect() }, 1000)
