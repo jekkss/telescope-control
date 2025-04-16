@@ -1,7 +1,7 @@
 import socket, datetime
 
 # Задаем адрес сервера
-SERVER_ADDRESS = ('192.168.0.1', 9998)
+SERVER_ADDRESS = ('192.168.100.1', 9998)
 
 ip_address = '0.0.0.0'  # желаемый IP-адрес
 port = 9998  # желаемый номер порта
@@ -12,9 +12,8 @@ server_socket.bind((ip_address, port))
 server_socket.listen(10)
 print('server is running, please, press ctrl+c to stop')
 
-
-
 def return_value(myString):
+    print(myString)
     if myString == ":GVP#":
         return "On-Step#"
     elif myString == ":GXEE#":
@@ -118,6 +117,9 @@ def return_value(myString):
     
     elif myString == ":Go#":
         return "900#" #Get Overhead Limit
+    
+    elif myString == ";GXY028C#":
+        return "Power,0#" #Get Overhead Limit
     
     print(myString)
     return "0.00#"

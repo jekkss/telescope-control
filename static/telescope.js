@@ -20,7 +20,6 @@ document.getElementById("haCorrection").addEventListener("mousemove", function (
 
   document.getElementById("buttonGoTo").addEventListener("mousedown", function () {
     calculateSteps()
-    console.log(1)
   })
 
   function calculateSteps(){
@@ -31,7 +30,6 @@ document.getElementById("haCorrection").addEventListener("mousemove", function (
     let dataJson = {
       ha: haResult,
       dec: decResult
-    } 
-    console.log(Date.getTime())  
+    }  
     //serialWrite(dataJson)
   }

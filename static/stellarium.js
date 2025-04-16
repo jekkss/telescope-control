@@ -6,6 +6,33 @@ let ha = 0, dec = 0, haCorrection = 0, decCorrection = 0, haCorrectionOld = 0, d
 let haStepInSec = 0, decStepInSec = 0, haStepOld = 0, decStepOld = 0, stepInSecTime = 0
 let haResult = 0, decResult = 0
 
+document.addEventListener('keydown', (event) => {
+  const key = event.key;
+  switch (key) {
+      case 'ArrowUp':   
+        document.getElementById('decCorrectionMicro').value = Number(document.getElementById('decCorrectionMicro').value) + 100
+        decCorrection = Number(document.getElementById('decCorrectionMicro').value) + Number(document.getElementById('decCorrection').value)
+        document.querySelector('.decCorrectionValue').innerHTML = decCorrection
+        break
+      case 'ArrowDown':  
+        document.getElementById('decCorrectionMicro').value = Number(document.getElementById('decCorrectionMicro').value) - 100
+        decCorrection = Number(document.getElementById('decCorrectionMicro').value) + Number(document.getElementById('decCorrection').value)
+        document.querySelector('.decCorrectionValue').innerHTML = decCorrection
+        break
+      case 'ArrowLeft':  
+        document.getElementById('haCorrectionMicro').value = Number(document.getElementById('haCorrectionMicro').value) - 100
+        haCorrection = Number(document.getElementById('haCorrectionMicro').value) + Number(document.getElementById('haCorrection').value)
+        document.querySelector('.haCorrectionValue').innerHTML = haCorrection
+        break
+      case 'ArrowRight': 
+        document.getElementById('haCorrectionMicro').value = Number(document.getElementById('haCorrectionMicro').value) + 100
+        haCorrection = Number(document.getElementById('haCorrectionMicro').value) + Number(document.getElementById('haCorrection').value)
+        document.querySelector('.haCorrectionValue').innerHTML = haCorrection
+        break
+  }
+  calculateSteps("goto")
+});
+
 document.getElementById("haCorrection").addEventListener("mouseup", function () {
   haCorrection = Number(document.getElementById('haCorrectionMicro').value) + Number(this.value)
   document.querySelector('.haCorrectionValue').innerHTML = haCorrection
@@ -42,6 +69,9 @@ document.getElementById("buttonGoTo").addEventListener("mousedown", function () 
 
 document.getElementById("buttonMovement").addEventListener("mousedown", function () {
   switchMovement.checked = !switchMovement.checked
+  if(!switchMovement.checked){
+    calculateSteps("goto")
+  }
 })
 
 document.getElementById("buttonHome").addEventListener("mousedown", function () {
@@ -53,10 +83,10 @@ document.getElementById("buttonHome").addEventListener("mousedown", function () 
   serialWrite(dataJson)
 })
 
-document.getElementById("selectTelescopePort").addEventListener("mousedown", function () {
+/*document.getElementById("selectTelescopePort").addEventListener("mousedown", function () {
   document.getElementById('selectTelescopePort').options.length = 0;
   serialPorts()
-})
+})*/
 
 document.getElementById("buttonTelescopeConnect").addEventListener("mousedown", function () {
   let e = document.getElementById("selectTelescopePort");
@@ -112,6 +142,9 @@ function calculateSteps(command){
     decSpeed: decStepInSec.toFixed(4)
   }   
   serialWrite(dataJson)
+
+  console.log(serialRead())
+
 }
 
 async function stellariumConnect() {
@@ -132,8 +165,8 @@ async function stellariumConnect() {
           dec = -dec
         }
         
-        document.querySelector('.telescopHa').innerHTML = "HA: " + ha.toFixed(1) + "/" + (ha / 0.005625).toFixed(0)
-        document.querySelector('.telescopDec').innerHTML = "Dec: " + dec.toFixed(1) + "/" + (dec / 0.084375).toFixed(0)
+        document.querySelector('.telescopHa').innerHTML = "HA: " + ha.toFixed(1) + " sec /" + (ha / 0.005625).toFixed(0) + " step"
+        document.querySelector('.telescopDec').innerHTML = "Dec: " + dec.toFixed(1) + " sec /" + (dec / 0.084375).toFixed(0) + " step"
         if (switchMovement.checked) {
           haResult = parseFloat((ha / 0.005625).toFixed(0)) + parseFloat(haCorrection)
           decResult = parseFloat((dec / 0.084375).toFixed(0)) + parseFloat(decCorrection)
@@ -161,3 +194,4 @@ async function stellariumConnect() {
 //readSettings()
 //writeSettings()
 intervalConnection = window.setInterval(function () { stellariumConnect() }, 1000)
+//window.document.hasFocus = function() {return true;}

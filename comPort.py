@@ -1,6 +1,7 @@
 import serial
 import serial.tools.list_ports
 import json
+import time
 
 telescopeComPort = None
 
@@ -18,13 +19,13 @@ def serialOpen(data):
     if(telescopeComPort != None):
         telescopeComPort.close()
         
-        telescopeComPort = serial.Serial(port, 115200)
+        telescopeComPort = serial.Serial(port, 9600)
         
         if telescopeComPort.is_open:
            return port + " open" 
     else:
         try:
-            telescopeComPort = serial.Serial(port, 115200) 
+            telescopeComPort = serial.Serial(port, 9600) 
             return port + " connected"
         except:
             return port + " disconnected"
@@ -40,9 +41,12 @@ def serialWrite(data):
         print(data)
     
 
-def serialRead(port):
-    ser = serial.Serial(port, 115200)
-    data = ser.readline().decode()
-    ser.close()
-    return data
+def serialRead():
+    global telescopeComPort
+    json_data = 1
+    if telescopeComPort.in_waiting > 0: 
+        data = telescopeComPort.readline().decode()
+        json_data = json.loads(data)
+        print(json_data)
+    return json_data
 

@@ -1,15 +1,15 @@
 #include <ArduinoJson.h>
 
-const byte enablePin = 9;
-const byte stepPinDec = 3;
-const byte directionPinDec = 2;
-const byte microStepPin1 = 8;
-const byte microStepPin2 = 7;
-const byte microStepPin3 = 6;
+const byte enablePin = 5;//9;
+const byte stepPinDec = 12;//3;
+const byte directionPinDec = 14;//2;
+const byte microStepPin1 = 13;//8;
+const byte microStepPin2 = 17;//7;
+const byte microStepPin3 = 18;//6;
 
-const byte stepPinHa = A1;
-const byte directionPinHa = A0;
-const byte microStepPinHa = A2;
+const byte stepPinHa = 35;//A1;
+const byte directionPinHa = 34;//A0;
+const byte microStepPinHa = 32;//A2;
 
 long currentPositionHa = 0;
 long currentPositionDec = 0;

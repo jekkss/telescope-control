@@ -28,17 +28,25 @@ function serialWrite(data) {
   })
 }
 
+async function serialRead() {
+  let response = await fetch("/serialRead")
+  //let responseOpen = await fetch("/serialOpen")
+
+  return response.text()
+}
+
 async function serialPorts() {
   let response = await fetch("/serialPorts")
+  let responseStatus = response.ok
   //let responseOpen = await fetch("/serialOpen")
-  if (response.ok) {
+  if (responseStatus) {
     let json = await response.text()
     json = json.slice(2,-2)
     let selectTag = document.querySelector('#selectTelescopePort');
     langArray = json.split('","')
     langArray.map( (lang, i) => {
         let opt = document.createElement("option");
-        opt.value = i;
+        opt.value = i + 1;
         opt.innerHTML = lang;
         selectTag.append(opt);
     });

@@ -1,8 +1,12 @@
 from sanic import Sanic, response
 from stellarium import stellariumConnect
 from settings import readSettings, writeSettings
-from comPort import serialPorts, serialWrite, serialOpen
-import serial
+from comPort import serialPorts, serialWrite, serialOpen, serialRead
+
+import socket
+host = socket.getaddrinfo(socket.gethostname(), None)
+ipv4_addresses = [i[4][0] for i in host if i[0] == socket.AF_INET]
+print(ipv4_addresses) 
 
 app = Sanic(__name__)
 app.static('/static/', './static/')
@@ -31,9 +35,13 @@ async def sPorts(request):
 def sWrite(request):
     return response.json(serialWrite(request.body))
 
+@app.route('/serialRead')
+async def sRead(request):
+    return response.json(serialRead())  
+
 @app.route('/serialOpen', methods=["POST"])
 def sOpen(request):
     return response.json(serialOpen(request.body))
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=1337, debug=False, access_log=False)
