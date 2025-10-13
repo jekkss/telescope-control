@@ -10,13 +10,16 @@ def stellariumConnect():
         array = {
             'coordinates': '',
             'info': 'Stellarium is not connected!',
+            'latitude' : '',
+            'longitude' : '',
             'status': 404
         }
     else:
         data =  StellariumResponse.text
         data_json = json.loads(data)
         selectioninfo = data_json['selectioninfo']
-        bodyTag = selectioninfo.find('HA/Dec:')  # "Ч.У./Скл.:"
+
+        bodyTag = selectioninfo.find('HA/Dec:')  # "HA/Dec: Ч.У./Скл.:"
         selectionObjectInfo = selectioninfo[:bodyTag]
         
         selectioninfo = selectioninfo[bodyTag + 7:]
@@ -37,6 +40,8 @@ def stellariumConnect():
             array = {
                 'info': 'Stellarium connected! The object is not selected!',
                 'coordinates': '',
+                'latitude' : '',
+                'longitude' : '',
                 'status': 500
             }
         else:
@@ -45,7 +50,8 @@ def stellariumConnect():
             array = {
                 'coordinates': selectioninfo,
                 'info': selectionObjectInfo,
+                'latitude' : data_json['location']['latitude'],
+                'longitude' : data_json['location']['longitude'],
                 'status': 200
             }
-
     return array

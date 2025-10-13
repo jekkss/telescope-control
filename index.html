@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <link rel="icon" href="static/icon/favicon.ico" type="image/x-icon">
-  <link href="static/css/bootstrap.min.css" rel="stylesheet">
+  <link href="static/css/bootstrap.css" rel="stylesheet">
   <title>Telescope control</title>
   <style>
     .form-range::-webkit-slider-thumb {
@@ -24,21 +24,31 @@
     .nav-tabs > li > button {
       color: yellowgreen;
     }
+    .btn-arrow{
+      height:100px;
+      width:100px;
+      font-size: 24px;
+    }
+
+    .btn-head{
+      height:50px;
+      width:100px;
+      font-size: 24px;
+    }
+
     .btn-primary{
       background-color: yellowgreen;
       border-color: white;
     }
-    .btn-primary:hover, .btn-primary:visited {
-      background-color: rgb(162, 216, 54);
-      border-color: rgb(195, 255, 67);
-    }
-    .btn-primary:hover {
-      background-color: rgb(109, 145, 38) !important;
-      border-color: rgb(195, 255, 67) !important;
+    .btn-primary:hover,
+    .btn-primary:active    {
+        background-color: #3276b1;
+        color: #FFF;
+        border-color: #285e8e;
     }
 
     .form-check-input:checked{
-      background-color: yellowgreen;
+      background-color: rgb(212, 230, 178);
     }
 
   </style>
@@ -66,22 +76,100 @@
         <div class="tab-content" id="myTabContent">
           <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
             <div class="container">
-              <div class="row justify-content-left">
-                <div class="col-md-auto telescopInfo">Stellarium is not connected!</div>
+                
+              <div class="row mt-2 justify-content-center">
+                <div class="col" align="center">
+                  <div class="btn-group" role="group">
+                    <button class="btn btn-head btn-primary" type="button" id="buttonSocketGoTo">Go To</button>
+                    <button class="btn btn-head btn-primary" type="button" id="buttonMove">Move</button>
+                    <button class="btn btn-head btn-primary" type="button" id="buttonSocketHome">Home</button>
+                  </div>
+                </div>
               </div>
-              <div class="row justify-content-left">
-                <div class="col-md-auto telescopCoordinates"></div>
+
+              <div class="row mt-2 justify-content-center">
+                <div class="col" align="center">
+                  <div class="btn-group" role="group">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="syncSpeed" id="inlineRadio1" value="1" checked>
+                      <label class="form-check-label" for="inlineRadio1">Low</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="syncSpeed" id="inlineRadio2" value="4">
+                      <label class="form-check-label" for="inlineRadio2">Middle</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="syncSpeed" id="inlineRadio3" value="10">
+                      <label class="form-check-label" for="inlineRadio3">Hight</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row mt-2 justify-content-center">
+                <div class="col" align="center">
+                  <div class="btn-group" role="group">
+                    <button class="btn btn-arrow btn-primary btn-lg" type="button" id="buttonLeftUp">&#8662;</button>
+                    <button class="btn btn-arrow btn-primary btn-lg" type="button" id="buttonUp">&#8657;</button>
+                    <button class="btn btn-arrow btn-primary btn-lg" type="button" id="buttonRightUp">&#8663;</button>
+                  </div>
+                </div>
               </div>
               <div class="row justify-content-center">
+                <div class="col" align="center">
+                  <div class="btn-group" role="group">
+                    <button class="btn btn-arrow btn-primary btn-lg" type="button" id="buttonLeft">&#8656;</button>
+                    <button class="btn btn-arrow btn-primary btn-lg" type="button" id="buttonStop">Stop</button>
+                    <button class="btn btn-arrow btn-primary btn-lg" type="button" id="buttonRight">&#8658;</button>
+                  </div>
+                </div>
+              </div>
+              <div class="row justify-content-center">
+                <div class="col" align="center">
+                  <div class="btn-group" role="group">
+                    <button class="btn btn-arrow btn-primary btn-lg" type="button" id="buttonDownLeft">&#8665;</button>
+                    <button class="btn btn-arrow btn-primary btn-lg" type="button" id="buttonDown">&#8659;</button>
+                    <button class="btn btn-arrow btn-primary btn-lg" type="button" id="buttonRightDown">&#8664;</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mt-2 justify-content-left">
+                <div class="col-sm"></div>
+                <div class="col-md-auto telescopInfo">Stellarium is not connected!</div>
+                <div class="col-sm"></div>
+              </div>
+
+              <div class="row mt-2 justify-content-left">
+                <div class="col-sm"></div>
+                <div class="col-md-auto telescopCoordinates"></div>
+                <div class="col-sm"></div>
+              </div>
+              <div class="row mt-2 justify-content-center">
                 <div class="col">
                   <div class="col-md-auto telescopHa"></div>
                   <div class="col-md-auto telescopDec"></div>
+                </div>
+              </div>
+              <div class="row mt-2 justify-content-center">
+                <div class="col">
+                  <div class="col-md-auto telescopCurrentHa"></div>
+                  <div class="col-md-auto telescopCurrentDec"></div>
+                </div>
+              </div>
+              
+              <!--<div class="row justify-content-center">
+                <div class="col"> -->   
+                  <!--<button class="btn btn-primary" type="button" id="buttonSocketSend">Send socket</button>-->
+                  
 
-                  <button class="btn btn-primary" type="button" id="buttonGoTo">Go To</button>
+                  <!--<button class="btn btn-primary" type="button" id="buttonSocketMovement">Movement</button>-->
+                  
+                  <!--<button class="btn btn-primary" type="button" id="buttonGoTo">Go To</button>
                   <button class="btn btn-primary" type="button" id="buttonMovement">Movement</button>
                   <button class="btn btn-primary" type="button">Stop</button>
-                  <button class="btn btn-primary" type="button" id="buttonHome">Home</button>
-
+                  <button class="btn btn-primary" type="button" id="buttonHome">Home</button>-->
+<!--
                   <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" id="switchMovement">
                     <label class="form-check-label" for="flexSwitchCheckChecked">Movement</label>
@@ -100,7 +188,7 @@
                   <input type="range" class="form-range" min="-50000" max="50000" id="decCorrectionMicro">
 
                 </div>
-              </div>
+              </div>-->
             </div>
           </div>
           <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
@@ -127,6 +215,14 @@
                 <div class="row justify-content-left">
                   <div class="col-md-auto stellariumInfo">Stellarium is not connected!</div>
                 </div>
+                
+                <div class="row mt-2 justify-content-center">
+                  <div class="col">
+                    <div class="col-md-auto socketInfo">Socket disconnected!</div>
+                    <button class="btn btn-primary" type="button" id="buttonSocketOpen">Open socket</button>
+                  </div>
+                </div>
+              </div>
               </div>
               <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1">Telescope com port</span>
@@ -134,7 +230,10 @@
                   <option value="1" selected></option>
                 </select>
                 <button type="button" class="btn btn-primary" id="buttonTelescopeConnect">Connect</button>
+                <button type="button" class="btn btn-primary" id="buttonTelescopeDisconnect">Disconnect</button>
+                
               </div>
+              <p class="col-md-auto" id="comPortInfo">COM port is not connected!</p>
 
               <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1">Focuser com port</span>
@@ -143,14 +242,18 @@
                 </select>
                 <button type="button" class="btn btn-primary" id="buttonFocuserConnect">Connect</button>
               </div>
+
+              <div class="overflow-auto" style="height: 300px;">
+                <p class="col-md-auto" id="telescopeComPortInfoLog"></p>
+              </div>
+              
               
             </div>
           </div>
           <div class="tab-pane fade" id="disabled-tab-pane" role="tabpanel" aria-labelledby="disabled-tab" tabindex="0">
             <div class="input-group mb-3">
-              <label class="input-group-text">Stellarium url</label>
-              <input type="text" class="form-control" placeholder="stellariumUrl" aria-label="stellariumUrl"
-                value="http://localhost:8090">
+              <label class="input-group-text">socket url</label>
+              <input type="text" class="form-control" placeholder="socketUrl" aria-label="socketUrl" id="socketUrl" value="192.168.15.207:9999">
             </div>
 
             <div class="input-group mb-3">
@@ -182,8 +285,10 @@
 
   <script src="static/js/bootstrap.min.js"> </script>
   <script src="static/stellarium.js"></script>
+  <script src="static/telescope.js"></script>
   <script src="static/focuser.js"></script>
   <script src="static/comPort.js"></script>
+  <script src="static/socket.js"></script>
 </body>
 
 </html>

@@ -1,7 +1,8 @@
 from sanic import Sanic, response
 from stellarium import stellariumConnect
 from settings import readSettings, writeSettings
-from comPort import serialPorts, serialWrite, serialOpen, serialRead
+from comPort import serialPorts, serialTelescopeWrite, serialTelescopeOpen, serialTelescopeClose, serialTelescopeRead
+from appAscomSocketCelestron import socketOpen, socketWrite, socketRead
 
 import socket
 host = socket.getaddrinfo(socket.gethostname(), None)
@@ -31,17 +32,34 @@ async def writeSet(request):
 async def sPorts(request):
     return response.json(serialPorts()) 
 
-@app.route('/serialWrite', methods=["POST"])
+@app.route('/serialTelescopeWrite', methods=["POST"])
 def sWrite(request):
-    return response.json(serialWrite(request.body))
+    return response.json(serialTelescopeWrite(request.body))
 
-@app.route('/serialRead')
+@app.route('/serialTelescopeRead')
 async def sRead(request):
-    return response.json(serialRead())  
+    return response.json(serialTelescopeRead())  
 
-@app.route('/serialOpen', methods=["POST"])
-def sOpen(request):
-    return response.json(serialOpen(request.body))
+@app.route('/serialTelescopeOpen', methods=["POST"])
+def sTOpen(request):
+    return response.json(serialTelescopeOpen(request.body))
+
+@app.route('/serialTelescopeClose', methods=["POST"])
+def sTClose(request):
+    return response.json(serialTelescopeClose(request.body))
+
+@app.route('/socketOpen', methods=["POST"])
+def soOpen(request):
+    return response.json(socketOpen(request.body))
+
+@app.route('/socketWrite', methods=["POST"])
+def soWrite(request):
+    return response.json(socketWrite(request.body))
+
+@app.route('/socketRead', methods=["POST"])
+def soRead(request):
+    return response.json(socketRead(request.body))
+
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=1337, debug=False, access_log=False)
+    app.run(host='127.0.0.1', port=1337, debug=False, access_log=False)

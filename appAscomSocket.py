@@ -1,9 +1,6 @@
 import socket, datetime
 
-# Задаем адрес сервера
-SERVER_ADDRESS = ('192.168.100.1', 9998)
-
-ip_address = '0.0.0.0'  # желаемый IP-адрес
+ip_address = '127.0.1.2'  # желаемый IP-адрес
 port = 9998  # желаемый номер порта
 
 # Настраиваем сокет
@@ -12,8 +9,19 @@ server_socket.bind((ip_address, port))
 server_socket.listen(10)
 print('server is running, please, press ctrl+c to stop')
 
+localDate = ""
+localTime = ""
+
+latitude = "+56*45:12"
+longitude = "-043*45:12"
+
+#N-Not slewing, H-At Home position,
+#P-Parked, p-Not parked, F-Park Failed,
+#I-park In progress, R-PEC Recorded
+#G-Guiding in progress, S-GPS PPS Synced
+
 def return_value(myString):
-    print(myString)
+    #print(myString)
     if myString == ":GVP#":
         return "On-Step#"
     elif myString == ":GXEE#":
@@ -34,13 +42,13 @@ def return_value(myString):
 
     # Get date
     elif myString.startswith(':SC'):
-        #localDate.text = myString[3:12]
+        localDate = myString[3:12]
         #calculateDate()
         parameterSet = True
         return "1"  # Set date
 
     elif myString.startswith(':SL'):
-        #localTime.text = myString[3:12]
+        localTime = myString[3:12]
         #calculateTime()
         parameterSet = True
         return "1" # Set time (Local)
@@ -73,7 +81,7 @@ def return_value(myString):
         return "+03#"  # Get UTC Offset (for current site)
 
     elif myString == ":SG+03#":
-        return "1"  # Set UTC Offset (for current site)
+        return "1#"  # Set UTC Offset (for current site)
 
 
     elif myString == ":GA#":
@@ -89,10 +97,10 @@ def return_value(myString):
         return "nNp#" # Get telescope Status
     
     elif myString == ":GtH#":
-        return "+56*45:12#" # Get current site Latitude, positive for North latitudes
+        return latitude + "#" # Get current site Latitude, positive for North latitudes
     
     elif myString == ":GgH#":
-        return "-043*45:12#" # Get current site Longitude
+        return longitude + "#" # Get current site Longitude
     
     elif myString == ":%BD#":
         return "0#" # Get Dec/Alt Antibacklash value in arc-seconds
@@ -101,16 +109,16 @@ def return_value(myString):
         return "0#" # Get RA/Azm Antibacklash value in arc-seconds
     
     elif myString == ":$BR0#":
-        return "1" # Set RA/Azm Antibacklash value in arc-seconds
+        return "1#" # Set RA/Azm Antibacklash value in arc-seconds
     
     elif myString == ":$BD0#":
-        return "1" # Set RA/Azm Antibacklash value in arc-seconds
+        return "1#" # Set RA/Azm Antibacklash value in arc-seconds
     
     elif myString == ":Sh-20#":
-        return "1"
+        return "1#"
     
     elif myString == ":So90#":
-        return "1"
+        return "1#"
     
     elif myString == ":Gh#":
         return "-200#" # Get Horizon Limit, the minimum elevation of the mount relative to the horizon
@@ -118,21 +126,35 @@ def return_value(myString):
     elif myString == ":Go#":
         return "900#" #Get Overhead Limit
     
-    elif myString == ";GXY028C#":
-        return "Power,0#" #Get Overhead Limit
+    elif myString == ":Me#":
+        return "" #Move telescope east (at current rate)
+    
+    elif myString == ":Mw#":
+        return "" #Move telescope west (at current rate)
+    
+    elif myString == ":Mn#":
+        return "" #Move telescope north (at current rate)
+    
+    elif myString == ":Ms#":
+        return "" #Move telescope south (at current rate)
     
     print(myString)
-    return "0.00#"
-
+    return "0#"
 
 # Слушаем запросы
 while True:
     connection, address = server_socket.accept()
     #print("new connection from {address}".format(address=address))
     data = connection.recv(1024)
+    #print(data)
     ascomStr = data.decode()
+    
     #print(ascomStr)
     sendValue = return_value(ascomStr)
-    sendValueByte = sendValue.encode('ASCII') #bytes(sendValue, encoding='ASCII')
-    connection.send(sendValueByte)
+    #print(sendValue)
+    str = ascomStr + "->" + sendValue
+    print(str)
+    if(sendValue != ""):
+        sendValueByte = sendValue.encode() #bytes(sendValue, encoding='ASCII')
+        connection.send(sendValueByte)
     connection.close()
