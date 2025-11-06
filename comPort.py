@@ -14,31 +14,24 @@ def serialPorts():
     return portList
 
 def serialTelescopeOpen(data):
+    print(data)
     global telescopeComPort
     port = data.decode('utf-8').replace('"', '')
     
     if(telescopeComPort != None):
         telescopeComPort.close()
         
-        telescopeComPort = serial.Serial(port, 9600)
+        telescopeComPort = serial.Serial(port, 115200)
         
         if telescopeComPort.is_open:
-           return port + " open" 
+           return "Connected" 
     else:
         try:
-            telescopeComPort = serial.Serial(port, 9600) 
-            return port + " connected"
+            telescopeComPort = serial.Serial(port, 115200) 
+            return "Connected"
         except:
-            return port + " disconnected"
+            return "Disconnected"
         
-def serialTelescopeClose(data):
-    global telescopeComPort
-    port = data.decode('utf-8').replace('"', '')
-    
-    if(telescopeComPort != None):
-        telescopeComPort.close()
-        return port + " disconnected"
-    
 def serialFocuserOpen(data):
     global focuserComPort
     port = data.decode('utf-8').replace('"', '')
@@ -46,16 +39,32 @@ def serialFocuserOpen(data):
     if(focuserComPort != None):
         focuserComPort.close()
         
-        focuserComPort = serial.Serial(port, 9600)
+        focuserComPort = serial.Serial(port, 115200)
         
         if focuserComPort.is_open:
-           return port + " open" 
+           return "Connected" 
     else:
         try:
-            focuserComPort = serial.Serial(port, 9600) 
-            return port + " connected"
+            focuserComPort = serial.Serial(port, 115200) 
+            return "Connected"
         except:
-            return port + " disconnected"    
+            return "Disconnected"
+        
+def serialTelescopeClose(data):
+    global telescopeComPort
+    port = data.decode('utf-8').replace('"', '')
+    
+    if(telescopeComPort != None):
+        telescopeComPort.close()
+        return "Disconnected"
+    
+def serialFocuserClose(data):
+    global focuserComPort
+    port = data.decode('utf-8').replace('"', '')
+    
+    if(focuserComPort != None):
+        focuserComPort.close()
+        return "Disconnected"
 
 def serialTelescopeWrite(data):
     global telescopeComPort

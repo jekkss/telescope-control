@@ -2,7 +2,6 @@ import socket
  
 client_socket = None
  
-
 def socketOpen(data):
     global client_socket
     
@@ -22,7 +21,6 @@ def socketOpen(data):
 
 
 def socketWrite(data):
-    print(data)
     global client_socket
     client_socket.sendall(data) 
     return 1
