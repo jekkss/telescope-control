@@ -13,10 +13,12 @@ def socketOpen(data):
         client_socket.close()
         
     try:
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect((host, int(port)))
         return "connected"
-    except:
+    except (OSError, ValueError) as error:
+        print(f"Error connecting socket to {host}:{port}: {error}")
+        client_socket = None
         return "disconnected"
 
 

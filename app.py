@@ -1,9 +1,10 @@
+import asyncio
+
 from sanic import Sanic, response
 from stellarium import stellariumConnect
 from settings import readSettings, writeSettings
-from comPort import serialPorts, serialTelescopeWrite, serialTelescopeOpen, serialTelescopeClose, serialTelescopeRead, serialFocuserOpen, serialFocuserClose
+from comPort import serialPorts, serialTelescopeWrite, serialTelescopeOpen, serialTelescopeClose, readTelescopeLine, serialFocuserOpen, serialFocuserClose
 from appAscomSocketCelestron import socketOpen, socketWrite, socketRead
-from ascomSocket import ascomWrite
 
 #import socket
 #host = socket.getaddrinfo(socket.gethostname(), None)
@@ -37,10 +38,6 @@ async def sPorts(request):
 def sWrite(request):
     return response.json(serialTelescopeWrite(request.body))
 
-@app.route('/serialTelescopeRead')
-async def sRead(request):
-    return response.json(serialTelescopeRead())  
-
 @app.route('/serialTelescopeOpen', methods=["POST"])
 def sTOpen(request):
     return response.json(serialTelescopeOpen(request.body))
@@ -68,6 +65,40 @@ def soWrite(request):
 @app.route('/socketRead', methods=["POST"])
 def soRead(request):
     return response.json(socketRead(request.body))
+
+# --- Telescope telemetry over WebSocket ---------------------------------
+# A single background task reads the serial port and pushes each line to all
+# connected browsers, replacing the old 100 ms HTTP polling loop.
+
+telescope_ws_clients = set()
+
+@app.websocket('/ws/telescope')
+async def telescope_ws(request, ws):
+    telescope_ws_clients.add(ws)
+    try:
+        # Keep the connection open; the browser is a passive listener.
+        async for _ in ws:
+            pass
+    finally:
+        telescope_ws_clients.discard(ws)
+
+async def telescope_reader():
+    loop = asyncio.get_event_loop()
+    while True:
+        # Run the blocking pyserial read off the event loop.
+        line = await loop.run_in_executor(None, readTelescopeLine)
+        if line and telescope_ws_clients:
+            for ws in list(telescope_ws_clients):
+                try:
+                    await ws.send(line)
+                except Exception:
+                    telescope_ws_clients.discard(ws)
+        elif not line:
+            await asyncio.sleep(0.05)
+
+@app.before_server_start
+async def start_background_tasks(app, loop):
+    app.add_task(telescope_reader())
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=1337, debug=False, access_log=False)

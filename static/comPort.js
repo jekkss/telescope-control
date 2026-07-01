@@ -29,6 +29,19 @@ async function openComPort(data) {
       body: JSON.stringify(data),
     })
     let json = await response.text()
+
+    if(document.querySelector('#comPortInfo').innerHTML == "Disconnected" && json.slice(1,-1) == "Connected"){
+     /* let dataJson = {
+        ha: Math.round(haWrite),
+        dec: Math.round(decWrite),
+        corHa: dirHa * syncSpeed,
+        corDec: dirDec * syncSpeed,
+        command: "device",
+        haSpeed:237.037037,
+        side: side
+      }  
+      serialWrite(dataJson)*/
+    }
     document.querySelector('#comPortInfo').innerHTML = json.slice(1,-1)
 }
 
@@ -84,13 +97,6 @@ function serialWrite(data) {
   })
 }
 
-async function serialRead() {
-  let response = await fetch("/serialTelescopeRead")
-  //let responseOpen = await fetch("/serialOpen")
-
-  return response.text()
-}
-
 async function serialPorts(option) {
   let response = await fetch("/serialPorts")
   let responseStatus = response.ok
@@ -130,45 +136,52 @@ function formatTime(totalSeconds) {
     return `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
 }
 
-async function comPortConnect() {
-  if(document.querySelector('#comPortInfo').innerHTML.slice(-4) == "open"){
-    let result = await serialRead()
+function handleTelescopeData(result) {
+  let resultJson
+  try {
     resultJson = JSON.parse(result)
-
-    if(resultJson){
-      side = document.querySelector('input[name="inlineRadioOptions"]:checked').value
-      haCurrent = resultJson.ha
-      decCurrent = resultJson.dec
-      if(side == "East"){
-        haCurrent += 43200
-        decCurrent = decCurrent - 648000
-      }
-      if(haCurrent >= 0){
-        document.querySelector('.telescopCurrentHa').innerHTML = formatTime(haCurrent)  
-      }else{
-        document.querySelector('.telescopCurrentHa').innerHTML = formatTime(haCurrent + 86400)
-      }
-      
-      if(decCurrent >= 0){
-        document.querySelector('.telescopCurrentDec').innerHTML = formatTime(decCurrent)
-      }else{
-        document.querySelector('.telescopCurrentDec').innerHTML = "-" + formatTime(-decCurrent)
-      }
-
-      document.querySelector('.telescopCurrentCoordinates').innerHTML = "Current HA/Dec: " + document.querySelector('.telescopCurrentHa').innerHTML + "/" + document.querySelector('.telescopCurrentDec').innerHTML
-
-      document.querySelector('.telescopStatus').innerHTML = resultJson.status 
-    }
-    
-    /*if(resultJson.dec){
-      document.querySelector('.telescopCurrentDec').innerHTML = resultJson.dec
-    }*/
-
-    if(result !== "null" && result !== "0")
-      document.querySelector('#telescopeComPortInfoLog').innerHTML = result + "<br>" + document.querySelector('#telescopeComPortInfoLog').innerHTML 
-
+  } catch (e) {
+    return  // ignore non-JSON lines
   }
-  
+
+  if(resultJson){
+    side = document.querySelector('input[name="inlineRadioOptions"]:checked').value
+    haCurrent = resultJson.ha
+    decCurrent = resultJson.dec
+    if(side == "East"){
+      haCurrent += 43200
+      decCurrent = decCurrent - 648000
+    }
+    if(haCurrent >= 0){
+      document.querySelector('.telescopCurrentHa').innerHTML = formatTime(haCurrent)
+    }else{
+      document.querySelector('.telescopCurrentHa').innerHTML = formatTime(haCurrent + 86400)
+    }
+
+    if(decCurrent >= 0){
+      document.querySelector('.telescopCurrentDec').innerHTML = formatTime(decCurrent)
+    }else{
+      document.querySelector('.telescopCurrentDec').innerHTML = "-" + formatTime(-decCurrent)
+    }
+
+    document.querySelector('.telescopCurrentCoordinates').innerHTML = "Current HA/Dec: " + document.querySelector('.telescopCurrentHa').innerHTML + "/" + document.querySelector('.telescopCurrentDec').innerHTML
+
+    document.querySelector('.telescopStatus').innerHTML = resultJson.status
+  }
+
+  if(result !== "null" && result !== "0")
+    document.querySelector('#telescopeComPortInfoLog').innerHTML = result + "<br>" + document.querySelector('#telescopeComPortInfoLog').innerHTML
 }
 
-intervalComPort = window.setInterval(function () { comPortConnect() }, 100)
+// Persistent telemetry channel: the server pushes serial lines as they arrive,
+// with auto-reconnect if the connection drops.
+let telescopeSocket = null
+
+function connectTelescopeSocket() {
+  telescopeSocket = new WebSocket(`ws://${location.host}/ws/telescope`)
+  telescopeSocket.onmessage = function (event) { handleTelescopeData(event.data) }
+  telescopeSocket.onclose = function () { setTimeout(connectTelescopeSocket, 1000) }
+  telescopeSocket.onerror = function () { telescopeSocket.close() }
+}
+
+connectTelescopeSocket()

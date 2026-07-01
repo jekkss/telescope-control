@@ -1,1 +1,5 @@
-"{\"id\":123,\"name\":\"John Doe\",\"email\":\"johndoe@example.com\"}"
+{
+  "id": 123,
+  "name": "John Doe",
+  "email": "johndoe@example.com"
+}

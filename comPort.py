@@ -13,43 +13,46 @@ def serialPorts():
         portList.append(port.device)
     return portList
 
-def serialTelescopeOpen(data):
-    print(data)
+def serialOpen(data, device):
     global telescopeComPort
-    port = data.decode('utf-8').replace('"', '')
-    
-    if(telescopeComPort != None):
-        telescopeComPort.close()
-        
-        telescopeComPort = serial.Serial(port, 115200)
-        
-        if telescopeComPort.is_open:
-           return "Connected" 
-    else:
-        try:
-            telescopeComPort = serial.Serial(port, 115200) 
-            return "Connected"
-        except:
-            return "Disconnected"
-        
-def serialFocuserOpen(data):
     global focuserComPort
+
     port = data.decode('utf-8').replace('"', '')
-    
-    if(focuserComPort != None):
-        focuserComPort.close()
-        
-        focuserComPort = serial.Serial(port, 115200)
-        
-        if focuserComPort.is_open:
-           return "Connected" 
-    else:
+    #print(port)
+
+    # Close a previously opened handle before reconnecting.
+    existing = telescopeComPort if device == "telescope" else focuserComPort
+    if existing is not None:
         try:
-            focuserComPort = serial.Serial(port, 115200) 
-            return "Connected"
-        except:
-            return "Disconnected"
-        
+            existing.close()
+        except (serial.SerialException, OSError) as error:
+            print(f"Error closing {device} port: {error}")
+
+    try:
+        # timeout so a partial line never blocks the reader indefinitely
+        connection = serial.Serial(port, 115200, timeout=1)
+    except (serial.SerialException, ValueError, OSError) as error:
+        print(f"Error opening {device} port {port}: {error}")
+        # Reset the handle so the next attempt starts from a clean state.
+        if device == "telescope":
+            telescopeComPort = None
+        else:
+            focuserComPort = None
+        return "Disconnected"
+
+    if device == "telescope":
+        telescopeComPort = connection
+    else:
+        focuserComPort = connection
+
+    return "Connected" if connection.is_open else "Disconnected"
+
+def serialTelescopeOpen(data):
+    return serialOpen(data, "telescope")
+
+def serialFocuserOpen(data):
+    return serialOpen(data, "focuser")
+
 def serialTelescopeClose(data):
     global telescopeComPort
     port = data.decode('utf-8').replace('"', '')
@@ -80,15 +83,22 @@ def serialFocuserWrite(data):
         focuserComPort.write(b'\n')
         print(data)
         
-def serialTelescopeRead():
-    global telescopeComPort
-    json_data = 0
-    if(telescopeComPort != None):
-        if telescopeComPort.in_waiting > 0: 
-            data = telescopeComPort.readline().decode()
-            json_data = json.loads(data) 
+def readTelescopeLine():
+    """Return one buffered line from the telescope port, or None if nothing is waiting.
 
-    return json_data
+    Used by the WebSocket reader task, so it stays cheap: no disk writes, no
+    JSON parsing (the raw line is forwarded to the browser as-is).
+    """
+    global telescopeComPort
+    if telescopeComPort is None:
+        return None
+    try:
+        if telescopeComPort.in_waiting > 0:
+            line = telescopeComPort.readline().decode(errors="replace").strip()
+            return line or None
+    except (serial.SerialException, OSError) as error:
+        print(f"Error reading telescope port: {error}")
+    return None
      
 def serialFocuserRead():
     global focuserComPort
